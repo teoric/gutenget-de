@@ -18,9 +18,9 @@
 #
 #         BUGS: <NaN>
 #       AUTHOR: Teoric <code.teoric@gmail.com>
-#      VERSION: 0.2
+#      VERSION: 0.2.1
 #      CREATED: 2011-08-23 15:35:01 (CEST)
-#  Last Change: 2013-03-26, 20:42:20 CET
+#  Last Change: 2013-04-05, 09:31:17 CEST
 #======================================================================
 
 package GutenbergDE;
@@ -30,9 +30,12 @@ require Exporter;
 @EXPORT_OK = qw(do_book init_dir);
 
 use strict;
+
 use warnings;
 use utf8;  # UTF-8 im Skript erlauben
 use feature qw{say state switch unicode_strings};
+use if $^V ge v5.14.0, 
+    "re"  => "/u"; # unicode regex possible after Perl 5.14
 use autodie;
 use IO::Handle;
 use open qw{:encoding(UTF-8) :std};
@@ -68,8 +71,8 @@ sub sanitize_filename{
     # mindestens <>| sind keine \p{Punct}
 
     # nicht zu viele __ und nicht am Schluss:
-    $ret =~ s/(?:$replacement){2,}//gu;
-    $ret =~ s/(?:$replacement)+(?=\.|\Z)//gu;
+    $ret =~ s/(?:$replacement){2,}//g;
+    $ret =~ s/(?:$replacement)+(?=\.|\Z)//g;
     return $ret;
 }
 
@@ -77,10 +80,14 @@ sub sanitize_filename{
 sub url_to_filename{
     # sollte man sich vielleicht noch einfacher machen
     my $fn = shift;
+    my $digits = shift;
+    my $extn = shift;
+    $extn = ".".$extn if ($extn !~ /^\./);
     my $replacement = shift() // "_";
+    $fn =~ s/(\d+)$/sprintf "%0${digits}d", $1/e;
     $fn =~ s{^(?:\w+:/*)}{}u;  # Erfasst z.B. nicht <>|
-    $fn =~ s{[/\p{Punct}]}{$replacement}gu;
-    return sanitize_filename($fn, $replacement);
+    $fn =~ s{[/\p{Punct}]}{$replacement}g;
+    return sanitize_filename($fn, $replacement)."$extn";
 }
 
 use  HTTP::Tiny; # ab 5.14 im Core; sonst # < 5.14 
@@ -98,7 +105,7 @@ $columns = 72;
 
 sub umbruch{
     my $ret = shift();
-    $ret =~ s{<(?:p|blockquote|ul|ol|li|h[1-9])\b}{\n\n$&}gu;
+    $ret =~ s{<(?:p|blockquote|ul|ol|li|h[1-9])\b}{\n\n$&}g;
     return wrap('','',$ret);
 }
 
@@ -120,11 +127,11 @@ sub get_guten_text{
     # Naja, eigentlich sollte es nur eine DIV mit der ID geben, aber…
     for my $div ($tree->look_down(
             _tag => 'div', 
-            id => qr/^gutenb$/u,
+            id => qr/^gutenb$/,
         )) {
         for my $fn ($div->look_down(
                 _tag => 'span', 
-                class => qr/\bfootnote\b/u,
+                class => qr/\bfootnote\b/,
             )) {
             $fn->tag("fussnote");
             $fn->attr("class",undef);
@@ -152,6 +159,8 @@ sub do_book{
     my @urls; # Stapel von URLS für ein Buch
     my $chaps = $$info{chapters};
     my $nr = $$info{nr};
+    use POSIX qw/floor log10/;
+    my $digits = 1 + floor(log10($chaps));
     for my $i (1..$chaps){
         push @urls, "http://gutenberg.spiegel.de/buch/${nr}/${i}" ;
     }
@@ -162,7 +171,7 @@ sub do_book{
     foreach my $url (@urls){
         printf STDERR "%-45s %s\n", $url, $$info{title} ;
         open my $of, ">:encoding(UTF-8)",
-            $BVZ->file(url_to_filename($url).".xml");
+            $BVZ->file(url_to_filename($url, $digits, ".xml"));
         say $of umbruch(get_guten_text($url));
         close($of);
     }

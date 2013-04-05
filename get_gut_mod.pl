@@ -35,7 +35,6 @@ use feature qw(say state switch unicode_strings);
 use autodie;
 use open qw( :encoding(UTF-8) :std );
 use IO::Handle;
-use v5.14;
 
 use GutenbergDE qw(do_book);
 use Getopt::Long::Descriptive;
@@ -57,7 +56,7 @@ my ($opt, $usage) = describe_options(
     ],
 );
 
-say STDERR "T: ", $$opt{title};
+say STDERR "Text: ", $$opt{title};
 GutenbergDE::init_dir($$opt{directory});
 
 do_book($opt);
