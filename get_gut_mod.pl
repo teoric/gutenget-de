@@ -16,7 +16,7 @@
 #       AUTHOR: Teoric <code.teoric@gmail.com>
 #      VERSION: 0.2
 #      CREATED: 2011-08-23 15:35:01 (CEST)
-#  Last Change: 2013-03-26, 20:42:14 CET
+#  Last Change: 2013-06-03, 14:45:07 CEST
 #======================================================================
 
 use strict;
@@ -50,6 +50,8 @@ my ($opt, $usage) = describe_options(
     ],
     [ 'chapters|c=i', "number of chapters (default: 1)",
         { default => 1 , },
+    ],
+    [ 'xml', "output XML (default: HTML)",
     ],
     [ 'directory|dir|d=s', "output directory (default: DATA)",
         { default => "DATA" , },

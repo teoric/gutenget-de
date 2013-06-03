@@ -20,7 +20,7 @@
 #       AUTHOR: Teoric <code.teoric@gmail.com>
 #      VERSION: 0.2.1
 #      CREATED: 2011-08-23 15:35:01 (CEST)
-#  Last Change: 2013-04-05, 09:31:17 CEST
+#  Last Change: 2013-06-03, 14:47:15 CEST
 #======================================================================
 
 package GutenbergDE;
@@ -35,7 +35,7 @@ use warnings;
 use utf8;  # UTF-8 im Skript erlauben
 use feature qw{say state switch unicode_strings};
 use if $^V ge v5.14.0, 
-    "re"  => "/u"; # unicode regex possible after Perl 5.14
+    re => "/u"; # unicode regex possible after Perl 5.14
 use autodie;
 use IO::Handle;
 use open qw{:encoding(UTF-8) :std};
@@ -111,6 +111,8 @@ sub umbruch{
 
 sub get_guten_text{
     my $url = shift();
+    my $serialize = shift() ? "as_XML" : "as_HTML";
+
     my $tree;
     my $ret; # Rückgabewert
     my $u = $ua->get($url);
@@ -137,7 +139,7 @@ sub get_guten_text{
             $fn->attr("class",undef);
         }
         # doppelt decode_entities, weil Gutenberg Bugs hat
-       $ret .= decode_entities(decode_entities($div->as_XML()));
+       $ret .= decode_entities(decode_entities($div->$serialize()));
     }
     $tree->delete();
     return $ret
@@ -171,8 +173,9 @@ sub do_book{
     foreach my $url (@urls){
         printf STDERR "%-45s %s\n", $url, $$info{title} ;
         open my $of, ">:encoding(UTF-8)",
-            $BVZ->file(url_to_filename($url, $digits, ".xml"));
-        say $of umbruch(get_guten_text($url));
+            $BVZ->file(url_to_filename($url, $digits, $info->{xml} ?
+                    ".xml" : ".html"));
+        say $of umbruch(get_guten_text($url, $info->{xml}));
         close($of);
     }
 
