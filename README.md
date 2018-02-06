@@ -4,7 +4,7 @@ These scripts can be used to fetch/grab e-texts (= ‘books’) from [Gutenberg-
 
 Texts are saved in subdirectories and contain XML that is mostly XHTML + a tag `<fussnote>` for footnotes, without the boilerplate that surrounds the HTML presentation.
 
-Documentation inside the scripts is in German, as are the texts at Gutenberg-DE. The code is simple, anyway.  
+Documentation inside the scripts is in German, as are the texts at Gutenberg-DE. The code is simple, anyway.
 
 - `GutenbergDE.pm` – [Perl](http://www.perl.org) module, depends on
   [Getopt::Long::Descriptive](http://search.cpan.org/~rjbs/Getopt-Long-Descriptive/lib/Getopt/Long/Descriptive.pm)

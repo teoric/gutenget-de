@@ -1,10 +1,10 @@
-#!/usr/bin/env perl 
+#!/usr/bin/env perl
 #======================================================================
 #
 #  PACKAGE GutenbergDE
 #
 #  DESCRIPTION: Grab Data from Spiegel/Gutenberg
-# 
+#
 #     PROCEDURES:
 #         init_dir($output_dir): set output directory
 #         do_book(\%book_info): grab book
@@ -20,7 +20,7 @@
 #       AUTHOR: Teoric <code.teoric@gmail.com>
 #      VERSION: 0.2.1
 #      CREATED: 2011-08-23 15:35:01 (CEST)
-#  Last Change: 2018-02-06, 14:33:43 CET
+#  Last Change: 2018-02-06, 14:55:58 CET
 #======================================================================
 
 package GutenbergDE;
@@ -44,7 +44,7 @@ binmode(DATA, ":encoding(UTF-8)");
 
 
 # Encode brauchen wir doch nicht.
-# 
+#
 # Allerdings sind (mindestens) im Text "Der Streit der Facultaeten"
 # allerlei griechische Buchstaben doppelt escapiert.
 #
@@ -95,11 +95,11 @@ sub url_to_filename{
     return sanitize_filename($fn, $replacement)."$extn";
 }
 
-use  HTTP::Tiny; # ab 5.14 im Core; sonst # < 5.14 
+use  HTTP::Tiny; # ab 5.14 im Core; sonst # < 5.14
 # require LWP::UserAgent;
 use  HTML::Entities;
 
-my $ua = HTTP::Tiny->new(); 
+my $ua = HTTP::Tiny->new();
 # my $ua = LWP::UserAgent->new; # < 5.14
 # $ua->timeout(10);
 # $ua->env_proxy;
@@ -141,21 +141,20 @@ sub get_guten_text{
     my $body = $mother->find("body");
     # Naja, eigentlich sollte es nur eine DIV mit der ID geben, aber…
     for my $div ($tree->look_down(
-            _tag => 'div', 
+            _tag => 'div',
             id => qr/^gutenb$/,
         )) {
         for my $fn ($div->look_down(
-                _tag => 'span', 
+                _tag => 'span',
                 class => qr/\bfootnote\b/,
             )) {
             $fn->tag("fussnote");
             $fn->attr("class",undef);
         }
-        # doppelt decode_entities, weil Gutenberg Bugs hat
-       # $ret .= decode_entities(decode_entities($div->$serialize()));
        $body->push_content($div);
     }
     $tree->delete();
+    # doppelt decode_entities, weil Gutenberg Bugs hat
     return decode_entities(decode_entities($mother->$serialize()));
 }
 

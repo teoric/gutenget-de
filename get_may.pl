@@ -1,10 +1,10 @@
-#!/usr/bin/env perl 
+#!/usr/bin/env perl
 #======================================================================
 #
 #         FILE: get_gut.pl
 #
 #        USAGE: ./get_gut.pl  [Nr-of-Book] [Nr-of-Book] ...
-#        
+#
 #          Nr-of-Book can be one of the numbers given in the
 #          URL of the text
 #
@@ -17,7 +17,7 @@
 #       AUTHOR: Teoric <code.teoric@gmail.com>
 #      VERSION: 0.2
 #      CREATED: 2011-08-23 15:35:01 (CEST)
-#  Last Change: 2018-02-06, 14:35:54 CET
+#  Last Change: 2018-02-06, 14:54:16 CET
 #======================================================================
 
 BEGIN {
@@ -35,7 +35,7 @@ use open qw{:encoding(UTF-8) :std};
 
 
 # Encode brauchen wir doch nicht.
-# 
+#
 # Allerdings sind (mindestens) im Text "Der Streit der Facultaeten"
 # allerlei griechische Buchstaben doppelt escapiert.
 #
@@ -56,33 +56,33 @@ use HTML::TreeBuilder;
 
 # Lese-Liste:
 my @reading_list = (
-    { 
-        nr => 2329, 
+    {
+        nr => 2329,
         title => "O1 - Durch die Wüste",
         chapters => 13
     },
-    { 
-        nr => 2330, 
+    {
+        nr => 2330,
         title => "O2 - Durchs wilde Kurdistan",
         chapters => 8
     },
-    { 
-        nr => 2317, 
+    {
+        nr => 2317,
         title => "O3 - Von Bagdad nach Stambul",
         chapters => 9
     },
-    { 
-        nr => 2321, 
+    {
+        nr => 2321,
         title => "O4 - In den Schluchten des Balkan",
         chapters => 9
     },
-    { 
-        nr => 2322, 
+    {
+        nr => 2322,
         title => "O5 - Durch das Land der Skipetaren",
         chapters => 8
     },
-    { 
-        nr => 2333, 
+    {
+        nr => 2333,
         title => "O6 - Der Schut",
         chapters => 8
     },
