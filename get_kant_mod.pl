@@ -17,9 +17,12 @@
 #       AUTHOR: Teoric <code.teoric@gmail.com>
 #      VERSION: 0.2
 #      CREATED: 2011-08-23 15:35:01 (CEST)
-#  Last Change: 2013-03-26, 20:42:04 CET
+#  Last Change: 2017-06-02, 19:25:18 CEST
 #======================================================================
 
+BEGIN {
+    push @INC, ".";
+}
 use strict;
 use warnings;
 use utf8;  # UTF-8 im Skript erlauben

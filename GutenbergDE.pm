@@ -20,7 +20,7 @@
 #       AUTHOR: Teoric <code.teoric@gmail.com>
 #      VERSION: 0.2.1
 #      CREATED: 2011-08-23 15:35:01 (CEST)
-#  Last Change: 2013-06-03, 14:47:15 CEST
+#  Last Change: 2018-02-06, 14:33:43 CET
 #======================================================================
 
 package GutenbergDE;
@@ -34,13 +34,13 @@ use strict;
 use warnings;
 use utf8;  # UTF-8 im Skript erlauben
 use feature qw{say state switch unicode_strings};
-use if $^V ge v5.14.0, 
+use if $^V ge v5.14.0,
     re => "/u"; # unicode regex possible after Perl 5.14
 use autodie;
 use IO::Handle;
 use open qw{:encoding(UTF-8) :std};
 # use charnames qw( :full :short );
-# binmode(DATA, ":encoding(UTF-8)");
+binmode(DATA, ":encoding(UTF-8)");
 
 
 # Encode brauchen wir doch nicht.
@@ -60,6 +60,11 @@ my $OVZ;
 
 use HTML::TreeBuilder;
 
+my $HEADER;
+{
+    local $/ = undef;
+    $HEADER //= <DATA>;
+}
 
 sub sanitize_filename{
     # resultierender Dateiname ist auch für Windows geeignet.
@@ -109,9 +114,16 @@ sub umbruch{
     return wrap('','',$ret);
 }
 
+sub make_header{
+    my ($title, $nr, $head) = @_;
+    $head =~ s/\(TITLE\)/$title $nr/g;
+    return $head;
+}
 sub get_guten_text{
     my $url = shift();
     my $serialize = shift() ? "as_XML" : "as_HTML";
+    my $title = shift();
+    my $nr = shift();
 
     my $tree;
     my $ret; # Rückgabewert
@@ -124,8 +136,9 @@ sub get_guten_text{
     else {
         die "Huch, habe «$url» nicht lesen können!"
     }
-
-
+    my $mother = HTML::TreeBuilder->new_from_content(
+        make_header($title, $nr, $HEADER));
+    my $body = $mother->find("body");
     # Naja, eigentlich sollte es nur eine DIV mit der ID geben, aber…
     for my $div ($tree->look_down(
             _tag => 'div', 
@@ -139,10 +152,11 @@ sub get_guten_text{
             $fn->attr("class",undef);
         }
         # doppelt decode_entities, weil Gutenberg Bugs hat
-       $ret .= decode_entities(decode_entities($div->$serialize()));
+       # $ret .= decode_entities(decode_entities($div->$serialize()));
+       $body->push_content($div);
     }
     $tree->delete();
-    return $ret
+    return decode_entities(decode_entities($mother->$serialize()));
 }
 
 sub init_dir{
@@ -170,12 +184,14 @@ sub do_book{
     my $BVZ = $OVZ->subdir(sanitize_filename($$info{title}));
     # say STDERR $BVZ;
     $BVZ->mkpath(); # Verzeichnis ggf. anlegen
+    my $i;
     foreach my $url (@urls){
+        $i++;
         printf STDERR "%-45s %s\n", $url, $$info{title} ;
         open my $of, ">:encoding(UTF-8)",
             $BVZ->file(url_to_filename($url, $digits, $info->{xml} ?
                     ".xml" : ".html"));
-        say $of umbruch(get_guten_text($url, $info->{xml}));
+        say $of umbruch(get_guten_text($url, $info->{xml}, $info->{title}, $i));
         close($of);
     }
 
@@ -183,3 +199,11 @@ sub do_book{
 
 
 1;
+__DATA__
+<html>
+    <head>
+        <title>(TITLE)</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    </head>
+    <body></body>
+</html>
