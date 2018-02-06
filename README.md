@@ -10,7 +10,8 @@ Documentation inside the scripts is in German, as are the texts at Gutenberg-DE.
   [Getopt::Long::Descriptive](http://search.cpan.org/~rjbs/Getopt-Long-Descriptive/lib/Getopt/Long/Descriptive.pm)
 and [HTML::TreeBuilder](http://search.cpan.org/~cjm/HTML-Tree/lib/HTML/TreeBuilder.pm)
 - `get_gut_mod.pl` – Script for getting a text. See help and code for details.
-- `get_kant_mod.pl` – example script for getting Kant's texts.
+- `get_kant.pl` – example script for getting Kant's texts.
+- `get_may.pl` – example script for getting Karl May's Orientzyklus texts.
 
 - - -
 
